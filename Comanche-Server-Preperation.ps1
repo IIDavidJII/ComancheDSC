@@ -10,6 +10,13 @@ Import-DscResource -ModuleName 'PSDesiredStateConfiguration','NetworkingDSC' , '
 Node $AllNodes.NodeName {
 
 #Disable Firewall
+  Service MpsSvc
+  {
+    Name = "MpsSvc"
+    StartupType = "Manual"
+    State = "Running"
+  }
+
   Script DisableFirewalls
      {
        GetScript = {(Get-NetFirewallProfile -All -ErrorAction SilentlyContinue).Enabled}
@@ -127,8 +134,50 @@ $cd = @{
             NodeName = "CNC-ATI-SQL01"
             Role = "OASISSQL"
          }
+        
+        @{NodeName = "CNC-Prime01"}
+        @{NodeName = "CNC-Prime02"}
+        @{NodeName = "CNC-Prime03"}
+        @{NodeName = "CNC-Prime04"}
+        @{NodeName = "CNC-Prime05"}
+        @{NodeName = "CNC-Prime06"}
+        @{NodeName = "CNC-Prime07"}
+        @{NodeName = "CNC-Prime08"}
+        @{NodeName = "CNC-Prime09"}
+        @{NodeName = "CNC-Prime10"}
+        @{NodeName = "CNC-Prime11"}
+        @{NodeName = "CNC-Poller01"}
+        @{NodeName = "CNC-Poller02"}
+        @{NodeName = "CNC-Poller03"}
+        @{NodeName = "CNE-LOY-SQL01"}
+        @{NodeName = "CNE-LOY-WEB01"}
+        @{NodeName = "CNE-LOY-WEB02"}
+        @{NodeName = "CNE-LOY-APP01"}
+        @{NodeName = "CNE-LOY-APP02"}
+        @{NodeName = "CNE-LOY-GW01" }
+
                  )
 }
 ATIServerPrep -ConfigurationData $cd -OutputPath C:\DSC_Configuration
 
-Start-DscConfiguration -Path C:\DSC_Configuration -Wait -Force -Verbose
+#Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME01" -Wait -Force -Verbose
+
+#Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME02" -Wait -Force -Verbose
+#Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME03" -Wait -Force -Verbose
+#Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME04" -Wait -Force -Verbose
+#Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME05" -Wait -Force -Verbose
+#Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME06" -Wait -Force -Verbose
+#Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME07" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME08" -Wait -Force -Verbose
+#Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME09" -Wait -Force -Verbose
+#Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME10" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-PRIME11" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-Poller01" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-Poller02" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNC-Poller03" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNE-LOY-SQL01" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNE-LOY-WEB01" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNE-LOY-WEB02" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNE-LOY-APP01" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNE-LOY-APP02" -Wait -Force -Verbose
+Start-DscConfiguration -Path C:\DSC_Configuration\ -ComputerName "CNE-LOY-GW01" -Wait -Force -Verbose
