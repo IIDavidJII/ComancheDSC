@@ -2,12 +2,32 @@ Configuration ATIServerPrep
 {
   Param
     ( [String]
-      $TimeZone = 'Central Standard Time'
+      $TimeZone = 'Central Standard Time',
+
+      [String]
+      $OasisUser = 'comanche\svcOasis',
+
+      [String]
+      $LoyaltyUser = 'comanche\svcLoyalty',
+      
+      [String]
+      $timeStamp = (Get-Date).tostring()
     )
 
 Import-DscResource -ModuleName 'PSDesiredStateConfiguration','NetworkingDSC' , 'xSystemSecurity', 'cDTC', 'ComputerManagementDsc', 'SqlServerDsc'
 
 Node $AllNodes.NodeName {
+
+#remote Desktop
+ WindowsFeature RemoteAccess {
+   Ensure = "Present"
+   Name = "RemoteAccess"
+ }
+
+ WindowsFeature RemoteAccessDesktop {
+   Ensure = "Present"
+   Name = "Remote-Desktop-Services"
+ }
 
 #Disable Firewall
   Service MpsSvc
@@ -81,13 +101,6 @@ Node $AllNodes.NodeName {
           Name             = 'High performance'
         }
 
-#IP6 Disable
-     NetAdapterBinding DisableIPv6
-        {
-            InterfaceAlias = 'Ethernet0'
-            ComponentId    = 'ms_tcpip6'
-            State          = 'Disabled'
-        }
 
 #IPV4 disable nic Power Management
      Script DisablePowerManagement
@@ -124,6 +137,79 @@ Node $AllNodes.NodeName {
       
   }
 
+  Node $AllNodes.Where{$_.Role -eq "Oasis"}.NodeName
+  {
+    #add Oasis EXISTING account to local admin   
+    Group Administrators 
+     {
+       GroupName="Administrators"
+       MembersToInclude=$OasisUser
+     }
+
+     #IP6 Disable
+#     FOREACH ($Adapter in $(Get-NetAdapter))
+#        {
+#          NetAdapterBinding DisableIPv6
+#          {
+#            InterfaceAlias = $Adapter.name
+#            ComponentId    = 'ms_tcpip6'
+#            State          = 'Disabled'
+#        
+#          }
+#        }
+
+     NetAdapterBinding DisableIPv6
+        {
+            InterfaceAlias = 'Ethernet0'
+            ComponentId    = 'ms_tcpip6'
+            State          = 'Disabled'
+        }
+
+     NetAdapterBinding DisableIPv6_1
+        {
+            InterfaceAlias = 'NIC1'
+            ComponentId    = 'ms_tcpip6'
+            State          = 'Disabled'
+        }
+
+     NetAdapterBinding DisableIPv6_2
+        {
+            InterfaceAlias = 'NIC2'
+            ComponentId    = 'ms_tcpip6'
+            State          = 'Disabled'
+        }
+
+    
+     NetAdapterBinding DisableIPv6_3
+        {
+            InterfaceAlias = 'NIC3'
+            ComponentId    = 'ms_tcpip6'
+            State          = 'Disabled'
+        }
+
+     NetAdapterBinding DisableIPv6_4
+        {
+            InterfaceAlias = 'NIC4'
+            ComponentId    = 'ms_tcpip6'
+            State          = 'Disabled'
+        }
+  
+    }
+
+  }
+
+  Node $AllNodes.Where{$_.Role -eq "Loyalty"}.NodeName
+  {
+    #add Loyalty EXISTING account to local admin
+     Group Administrators 
+     {
+       GroupName = "Administrators"
+       MembersToInclude = $LoyaltyUser
+     }
+
+  }
+
+
   Node $AllNodes.Where{$_.Role -eq "SQLServer"}.NodeName
   {
     File CopySQLConfigScript {
@@ -157,8 +243,6 @@ Node $AllNodes.NodeName {
 
   }
 
-
-}
 #Only allowed one node name change as needed
 
 $cd = @{
@@ -255,82 +339,307 @@ $cd = @{
             Role = "nConnect"
          }
 
-        @{NodeName = "spur-prime01"}
-        @{NodeName = "spur-prime02"}
-        @{NodeName = "spur-prime03"}
-        @{NodeName = "spur-prime04"}
-        @{NodeName = "spur-prime05"}
-        @{NodeName = "spur-prime06"}
-        @{NodeName = "spur-prime07"}
-        @{NodeName = "spur-prime08"}
-        @{NodeName = "spur-prime09"}
-        @{NodeName = "spur-prime10"}
+        @{NodeName = "spur-prime01"
+            Role =  "Oasis" 
+         }
 
-        @{NodeName = "CNC-Prime01"}
-        @{NodeName = "CNC-Prime02"}
-        @{NodeName = "CNC-Prime03"}
-        @{NodeName = "CNC-Prime04"}
-        @{NodeName = "CNC-Prime05"}
-        @{NodeName = "CNC-Prime06"}
-        @{NodeName = "CNC-Prime07"}
-        @{NodeName = "CNC-Prime08"}
-        @{NodeName = "CNC-Prime09"}
-        @{NodeName = "CNC-Prime10"}
-        @{NodeName = "CNC-Prime11"}
-        @{NodeName = "CNC-Poller01"}
-        @{NodeName = "CNC-Poller02"}
-        @{NodeName = "CNC-Poller03"}
-        @{NodeName = "CNC-SMCACHE01"}
-        @{NodeName = "CNC-SMCACHE02"}
+        @{NodeName = "spur-prime02"
+          Role = "Oasis"
+         }
 
-        @{NodeName = "CNE-LOY-WEB01"}
-        @{NodeName = "CNE-LOY-WEB02"}
-        @{NodeName = "CNE-LOY-APP01"}
-        @{NodeName = "CNE-LOY-APP02"}
-        @{NodeName = "CNE-LOY-GW01" }
+        @{NodeName = "spur-prime03"
+          Role = "Oasis"
+         }
 
-        @{NodeName = "CNC-Test-Prime1"}
-        @{NodeName = "CNC-Test-Prime2"}
-        @{NodeName = "CNC-Test-Prime3"}
-        @{NodeName = "CNC-Test-Loyweb"}
-        @{NodeName = "CNC-Test-Loyapp"}
+        @{NodeName = "spur-prime04"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "spur-prime05"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "spur-prime06"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "spur-prime07"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "spur-prime08"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "spur-prime09"
+          Role  = "Oasis"
+         }
+
+        @{NodeName = "spur-prime10"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Spur-Poller01"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Spur-SMCache01"
+          Role = "Oasis"}
+
+        @{NodeName = "CNC-Prime01"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Prime02"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "CNC-Prime03"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Prime04"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "CNC-Prime05"
+          Role  = "Oasis"
+         }
+
+        @{NodeName = "CNC-Prime06"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Prime07"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "CNC-Prime08"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Prime09"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Prime10"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Prime11"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Poller01"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Poller02"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "CNC-Poller03"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-SMCACHE01"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-SMCACHE02"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "CNE-LOY-WEB01"
+          Role = "Loyalty"
+         }
+
+        @{NodeName = "CNE-LOY-WEB02"
+          Role = "Loyalty"
+         }
+
+        @{NodeName = "CNE-LOY-APP01"
+          Role = "Loyalty"
+         }
+
+        @{NodeName = "CNE-LOY-APP02"
+          Role = "Loyalty"
+         }
+
+        @{NodeName = "CNE-LOY-GW01" 
+          Role =  "Loyalty"
+         }
+
+        @{NodeName = "CNC-Test-Prime1"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Test-Prime2"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Test-Prime3"
+          Role =  "Oasis"
+         }
+        @{NodeName = "CNC-Test-Loyweb"
+          Role = "Loyalty"
+         }
+
+        @{NodeName = "CNC-Test-Loyapp"
+          Role = "Loyalty"
+         }
         
-        @{NodeName = "TRV-PRIME01"}
-        @{NodeName = "TRV-PRIME02"}
-        @{NodeName = "TRV-PRIME03"}
-        @{NodeName = "TRV-PRIME04"}
-        @{NodeName = "TRV-PRIME05"}
-        @{NodeName = "TRV-PRIME06"}
-        @{NodeName = "TRV-PRIME07"}
-        @{NodeName = "TRV-PRIME08"}
-        @{NodeName = "TRV-PRIME09"}
+        @{NodeName = "TRV-PRIME01"
+          Role  = "Oasis"
+         }
 
-        @{NodeName = "Star-Prime01"}
-        @{NodeName = "Star-Prime02"}
-        @{NodeName = "Star-Prime03"}
-        @{NodeName = "Star-Prime04"}
-        @{NodeName = "Star-Prime05"}
-        @{NodeName = "Star-Prime06"}
-        @{NodeName = "Star-Prime07"}
-        @{NodeName = "Star-Prime08"}
-        @{NodeName = "Star-Prime09"}
+        @{NodeName = "TRV-PRIME02"
+          Role = "Oasis"
+         }
 
-        @{NodeName = "CRRC-Prime01"}
-        @{NodeName = "CRRC-Prime02"}
-        @{NodeName = "CRRC-Prime03"}
-        @{NodeName = "CRRC-Prime04"}
-        @{NodeName = "CRRC-Prime05"}
-        @{NodeName = "CRRC-Prime06"}
-        @{NodeName = "CRRC-Prime07"}
-        @{NodeName = "CRRC-Prime08"}
-        @{NodeName = "CRRC-Prime09"}
-        @{NodeName = "CRRC-Prime10"}
-        @{NodeName = "CRRC-Prime11"}
-        @{NodeName = "CRRC-Poller01"}
-        @{NodeName = "CRRC-Poller02"}
-        @{NodeName = "CRRC-Poller03"}
-        @{NodeName = "CRRC-Smcache01"}
-        @{NodeName = "CRRC-SMcache02"}
+        @{NodeName = "TRV-PRIME03"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "TRV-PRIME04"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "TRV-PRIME05"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "TRV-PRIME06"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "TRV-PRIME07"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "TRV-PRIME08"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "TRV-PRIME09"
+          Role = "Oasis"
+         }
+        
+        @{NodeName = "TRV-Poller01"
+          Role = "Oasis"
+         }
+        
+        @{NodeName = "TRV-SMCache01"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Star-Prime01"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Star-Prime02"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Star-Prime03"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Star-Prime04"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Star-Prime05"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Star-Prime06"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Star-Prime07"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Star-Prime08"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Star-Prime09"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "Star-Poller01"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "Star-SMCache01"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "CRRC-Prime01"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-Prime02"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-Prime03"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-Prime04"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-Prime05"
+          Role = "Oasis" 
+         }
+
+        @{NodeName = "CRRC-Prime06"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-Prime07"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-Prime08"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-Prime09"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-Prime10"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "CRRC-Prime11"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "CRRC-Poller01"
+          Role =  "Oasis"
+         }
+
+        @{NodeName = "CRRC-Poller02"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-Poller03"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-Smcache01"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CRRC-SMcache02"
+          Role = "Oasis"
+         }
 
                  )
 }
@@ -340,7 +649,7 @@ ATIServerPrep -ConfigurationData $cd -OutputPath C:\DSC_Configuration
 Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CNC-Test-Loysql","CNC-Test-SQL","CNE-LOY-SQL01", "SPUR-ATI-SQL01", "TRV-ATI-SQL01", "Star-ATI-SQL01", "Crrc-ATI-SQL01", "Cne-Loy-SQL02" -Wait -Verbose -Force
 
 #Spur
-Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "SPUR-ATI-SQL01","SPUR-nConn01", "SPUR-nConn02","SPUR-Prime01","SPUR-Prime02","SPUR-Prime03","SPUR-Prime04","SPUR-Prime05","SPUR-Prime06","SPUR-Prime07","SPUR-Prime08","SPUR-Prime09" -wait -Force -verbose 4> "C:\DSC_Configuration\spurPush 8-23-29.txt"
+Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "SPUR-ATI-SQL01","SPUR-nConn01", "SPUR-nConn02","SPUR-Prime01","SPUR-Prime02","SPUR-Prime03","SPUR-Prime04","SPUR-Prime05","SPUR-Prime06","SPUR-Prime07","SPUR-Prime08","SPUR-Prime09","Spur-Poller01","Spur-SMCache01" -wait -Force -verbose 4> "C:\DSC_Configuration\spurPush 8-23-29.txt"
 
 #Comanche Nation Casinos
 Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CNC-ATI-SQL01","cnc-nconnect01", "cnc-nconnect02","CNC-Prime01","CNC-Prime02","CNC-Prime03","CNC-Prime04","CNC-Prime05","CNC-Prime06","CNC-Prime07","CNC-Prime08","CNC-Prime09", "CNC-Prime10","CNC-Prime11", "CNC-Poller01", "CNC-Poller02","CNC-Poller03", "CNC-SMCACHE01","CNC-SMCACHE02" -wait -Force -verbose 4> "C:\DSC_Configuration\CNC 8-23-29.txt"
@@ -352,7 +661,7 @@ Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CNE-LOY-SQL01",
 Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "TRV-ATI-SQL01","TRV-nConnect01","TRV-nConnect02", "TRV-Prime01","TRV-Prime02", "TRV-Prime03", "TRV-Prime04", "TRV-Prime05", "TRV-Prime06","TRV-Prime07", "TRV-Prime08","TRV-Prime09" -Wait -Force -Verbose 4> "C:\DSC_Configuration\TRV PUSH 8-23-19.txt"
 
 #Star
-Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "STAR-ATI-SQL01","STAR-nConnect01","STAR-nConnect02", "STAR-Prime01","STAR-Prime02", "STAR-Prime03", "STAR-Prime04", "STAR-Prime05", "STAR-Prime06","STAR-Prime07", "STAR-Prime08","STAR-Prime09" -Wait -Force -Verbose 4> "C:\DSC_Configuration\STAR PUSH 8-23-19.txt"
+Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "STAR-ATI-SQL01","STAR-nConnect01","STAR-nConnect02", "STAR-Prime01","STAR-Prime02", "STAR-Prime03", "STAR-Prime04", "STAR-Prime05", "STAR-Prime06","STAR-Prime07", "STAR-Prime08","STAR-Prime09", "Star-poller01", "Star-SMCache01" -Wait -Force -Verbose 4> "C:\DSC_Configuration\STAR PUSH 8-23-19.txt"
 
 #Red River
 Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CRRC-ATI-SQL01","cnc-nconnect01", "cnc-nconnect02","CRRC-Prime01","CRRC-Prime02","CRRC-Prime03","CRRC-Prime04","CRRC-Prime05","CRRC-Prime06","CRRC-Prime07","CRRC-Prime08","CRRC-Prime09", "CRRC-Prime10","CRRC-Prime11", "CRRC-Poller01", "CRRC-Poller02","CRRC-Poller03", "CRRC-SMCACHE01","CRRC-SMCACHE02" -wait -Force -verbose 4> "C:\DSC_Configuration\CRRC PUSH 8-23-29.txt"
