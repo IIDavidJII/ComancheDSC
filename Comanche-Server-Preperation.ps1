@@ -130,9 +130,21 @@ Node $AllNodes.NodeName {
 
    Registry HTTP2Disable2 {
      Ensure = "Present"
-     Key = "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\HTTP\Parameters"
+     Key = "HKEY_LOCAL_MACTHINE\System\CurrentControlSet\Services\HTTP\Parameters"
      ValueName = "EnableHttp2Cleartext"
      ValueData = "0"
+   }
+   
+   #Disable IPv6
+   Script IPV6Disable {
+   TestScript = {$AdapterIVP6 = Get-NetAdapterBinding -name * -ComponentID 'MS_TCPIP6'
+                 IF ($AdapterIVP6.enabled -eq 'True'){return $true} Else {return $false}
+                 }
+   SetScript = {$AdapterIVP6_1 = Get-NetAdapterBinding -name* -ComponentID 'MS_TCPIP6'
+                FOREACH ($Adapter_1 in $AdapterIVP6_1)
+                {Disable-NetAdapterBinding -Name $Adapter_1.Name -ComponentID 'MS_TCPIP6'}
+               }
+   GetScript ={Get-NetAdapterBinding -ComponentID 'MS_TCPIP6'} 
    }
       
   }
@@ -145,58 +157,9 @@ Node $AllNodes.NodeName {
        GroupName="Administrators"
        MembersToInclude=$OasisUser
      }
-
-     #IP6 Disable
-#     FOREACH ($Adapter in $(Get-NetAdapter))
-#        {
-#          NetAdapterBinding DisableIPv6
-#          {
-#            InterfaceAlias = $Adapter.name
-#            ComponentId    = 'ms_tcpip6'
-#            State          = 'Disabled'
-#        
-#          }
-#        }
-
-     NetAdapterBinding DisableIPv6
-        {
-            InterfaceAlias = 'Ethernet0'
-            ComponentId    = 'ms_tcpip6'
-            State          = 'Disabled'
-        }
-
-     NetAdapterBinding DisableIPv6_1
-        {
-            InterfaceAlias = 'NIC1'
-            ComponentId    = 'ms_tcpip6'
-            State          = 'Disabled'
-        }
-
-     NetAdapterBinding DisableIPv6_2
-        {
-            InterfaceAlias = 'NIC2'
-            ComponentId    = 'ms_tcpip6'
-            State          = 'Disabled'
-        }
-
-    
-     NetAdapterBinding DisableIPv6_3
-        {
-            InterfaceAlias = 'NIC3'
-            ComponentId    = 'ms_tcpip6'
-            State          = 'Disabled'
-        }
-
-     NetAdapterBinding DisableIPv6_4
-        {
-            InterfaceAlias = 'NIC4'
-            ComponentId    = 'ms_tcpip6'
-            State          = 'Disabled'
-        }
-  
-    }
-
   }
+
+  
 
   Node $AllNodes.Where{$_.Role -eq "Loyalty"}.NodeName
   {
@@ -208,7 +171,6 @@ Node $AllNodes.NodeName {
      }
 
   }
-
 
   Node $AllNodes.Where{$_.Role -eq "SQLServer"}.NodeName
   {
@@ -233,15 +195,9 @@ Node $AllNodes.NodeName {
          DestinationPath = "s:\DBE_Scripts\0.SQL Server Configuration.SQL"
          DependsOn = "[File]SQLConfigScript1"
       }
-
-#
-#    SqlRSSetup 'InstallDefulatInstance' {
-#           InstanceName         = 'MSSQLSERVER'
-#           DatabaseServerName   = 'localhost'
-#           DatabaseInstanceName = 'MSSQLSERVER'
-#      }
-
   }
+}
+
 
 #Only allowed one node name change as needed
 
@@ -640,8 +596,7 @@ $cd = @{
         @{NodeName = "CRRC-SMcache02"
           Role = "Oasis"
          }
-
-                 )
+                  )
 }
 ATIServerPrep -ConfigurationData $cd -OutputPath C:\DSC_Configuration
 
