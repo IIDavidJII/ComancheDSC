@@ -115,7 +115,10 @@ Node $AllNodes.NodeName {
                        Else {return $false}
                       }
 
-         SetScript = {Disable-NetAdapterPowerManagement -Name 'Ethernet0' -NoRestart}
+         SetScript = { $AdapterPower1 = Get-NetAdapterPowerManagement
+                       FOREACH($adapter1 in $AdapterPower1)
+                         {Disable-NetAdapterPowerManagement -Name $adapter1.name -NoRestart}
+                     }
 
          GetScript = {Get-NetAdapterPowerManagement}
        }
@@ -140,7 +143,7 @@ Node $AllNodes.NodeName {
    TestScript = {$AdapterIVP6 = Get-NetAdapterBinding -name * -ComponentID 'MS_TCPIP6'
                  IF ($AdapterIVP6.enabled -eq 'True'){return $true} Else {return $false}
                  }
-   SetScript = {$AdapterIVP6_1 = Get-NetAdapterBinding -name* -ComponentID 'MS_TCPIP6'
+   SetScript = {$AdapterIVP6_1 = Get-NetAdapterBinding -name * -ComponentID 'MS_TCPIP6'
                 FOREACH ($Adapter_1 in $AdapterIVP6_1)
                 {Disable-NetAdapterBinding -Name $Adapter_1.Name -ComponentID 'MS_TCPIP6'}
                }
@@ -444,7 +447,15 @@ $cd = @{
         @{NodeName = "CNC-Test-Loyapp"
           Role = "Loyalty"
          }
-        
+
+        @{NodeName = "CNC-TrackIT-DB"
+          Role = "Oasis"
+         }
+
+        @{NodeName = "CNC-Trackit-Web"
+          Role = "Oasis"
+         }
+     
         @{NodeName = "TRV-PRIME01"
           Role  = "Oasis"
          }
@@ -596,7 +607,11 @@ $cd = @{
         @{NodeName = "CRRC-SMcache02"
           Role = "Oasis"
          }
-                  )
+
+        @{NodeName = "CRRC-Trackit-DB"
+          Role = "Oasis"}
+
+                 )
 }
 ATIServerPrep -ConfigurationData $cd -OutputPath C:\DSC_Configuration
 
@@ -604,19 +619,22 @@ ATIServerPrep -ConfigurationData $cd -OutputPath C:\DSC_Configuration
 Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CNC-Test-Loysql","CNC-Test-SQL","CNE-LOY-SQL01", "SPUR-ATI-SQL01", "TRV-ATI-SQL01", "Star-ATI-SQL01", "Crrc-ATI-SQL01", "Cne-Loy-SQL02" -Wait -Verbose -Force
 
 #Spur
-Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "SPUR-ATI-SQL01","SPUR-nConn01", "SPUR-nConn02","SPUR-Prime01","SPUR-Prime02","SPUR-Prime03","SPUR-Prime04","SPUR-Prime05","SPUR-Prime06","SPUR-Prime07","SPUR-Prime08","SPUR-Prime09","Spur-Poller01","Spur-SMCache01" -wait -Force -verbose 4> "C:\DSC_Configuration\spurPush 8-23-29.txt"
+Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "SPUR-ATI-SQL01","SPUR-nConn01", "SPUR-nConn02","SPUR-Prime01","SPUR-Prime02","SPUR-Prime03","SPUR-Prime04","SPUR-Prime05","SPUR-Prime06","SPUR-Prime07","SPUR-Prime08","SPUR-Prime09","Spur-Poller01","Spur-SMCache01" -wait -Force -verbose 4> "C:\DSC_Configuration\spurPush $(Get-Date -Format MM-dd-yyyy).txt"
 
 #Comanche Nation Casinos
-Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CNC-ATI-SQL01","cnc-nconnect01", "cnc-nconnect02","CNC-Prime01","CNC-Prime02","CNC-Prime03","CNC-Prime04","CNC-Prime05","CNC-Prime06","CNC-Prime07","CNC-Prime08","CNC-Prime09", "CNC-Prime10","CNC-Prime11", "CNC-Poller01", "CNC-Poller02","CNC-Poller03", "CNC-SMCACHE01","CNC-SMCACHE02" -wait -Force -verbose 4> "C:\DSC_Configuration\CNC 8-23-29.txt"
+Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CNC-ATI-SQL01","cnc-nconnect01", "cnc-nconnect02","CNC-Prime01","CNC-Prime02","CNC-Prime03","CNC-Prime04","CNC-Prime05","CNC-Prime06","CNC-Prime07","CNC-Prime08","CNC-Prime09", "CNC-Prime10","CNC-Prime11", "CNC-Poller01", "CNC-Poller02","CNC-Poller03", "CNC-SMCACHE01","CNC-SMCACHE02" -wait -Force -verbose 4> "C:\DSC_Configuration\CNC $(get-date -Format MM-dd-yyyy).txt"
 
 #CNE
-Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CNE-LOY-SQL01","CNE-LOY-SQL02","CNE-LOY-WEB01","CNE-LOY-WEB02","CNE-LOY-APP01","CNE-LOY-GW01" -Wait -Force -Verbose 4> "C:\DSC_Configuration\CNE 8-23-2019 push.txt"
+Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CNE-LOY-SQL01","CNE-LOY-SQL02","CNE-LOY-WEB01","CNE-LOY-WEB02","CNE-LOY-APP01","CNE-LOY-GW01" -Wait -Force -Verbose 4> "C:\DSC_Configuration\CNE $(get-date -format MM-dd-yyyy) push.txt"
 
 #Travel
-Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "TRV-ATI-SQL01","TRV-nConnect01","TRV-nConnect02", "TRV-Prime01","TRV-Prime02", "TRV-Prime03", "TRV-Prime04", "TRV-Prime05", "TRV-Prime06","TRV-Prime07", "TRV-Prime08","TRV-Prime09" -Wait -Force -Verbose 4> "C:\DSC_Configuration\TRV PUSH 8-23-19.txt"
+Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "TRV-ATI-SQL01","TRV-nConnect01","TRV-nConnect02", "TRV-Prime01","TRV-Prime02", "TRV-Prime03", "TRV-Prime04", "TRV-Prime05", "TRV-Prime06","TRV-Prime07", "TRV-Prime08","TRV-Prime09", "TRV-Poller01", "TRV-SMCACHE01" -Wait -Force -Verbose 4> "C:\DSC_Configuration\TRV PUSH $(get-date -format MM-dd-yyyy).txt"
 
 #Star
-Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "STAR-ATI-SQL01","STAR-nConnect01","STAR-nConnect02", "STAR-Prime01","STAR-Prime02", "STAR-Prime03", "STAR-Prime04", "STAR-Prime05", "STAR-Prime06","STAR-Prime07", "STAR-Prime08","STAR-Prime09", "Star-poller01", "Star-SMCache01" -Wait -Force -Verbose 4> "C:\DSC_Configuration\STAR PUSH 8-23-19.txt"
+Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "STAR-ATI-SQL01","STAR-nConnect01","STAR-nConnect02", "STAR-Prime01","STAR-Prime02", "STAR-Prime03", "STAR-Prime04", "STAR-Prime05", "STAR-Prime06","STAR-Prime07", "STAR-Prime08","STAR-Prime09", "Star-poller01", "Star-SMCache01" -Wait -Force -Verbose 4> "C:\DSC_Configuration\STAR PUSH $(get-date -format MM-dd-yyyy).txt"
 
 #Red River
-Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CRRC-ATI-SQL01","cnc-nconnect01", "cnc-nconnect02","CRRC-Prime01","CRRC-Prime02","CRRC-Prime03","CRRC-Prime04","CRRC-Prime05","CRRC-Prime06","CRRC-Prime07","CRRC-Prime08","CRRC-Prime09", "CRRC-Prime10","CRRC-Prime11", "CRRC-Poller01", "CRRC-Poller02","CRRC-Poller03", "CRRC-SMCACHE01","CRRC-SMCACHE02" -wait -Force -verbose 4> "C:\DSC_Configuration\CRRC PUSH 8-23-29.txt"
+Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName "CRRC-ATI-SQL01","cnc-nconnect01", "cnc-nconnect02","CRRC-Prime01","CRRC-Prime02","CRRC-Prime03","CRRC-Prime04","CRRC-Prime05","CRRC-Prime06","CRRC-Prime07","CRRC-Prime08","CRRC-Prime09", "CRRC-Prime10","CRRC-Prime11", "CRRC-Poller01", "CRRC-Poller02","CRRC-Poller03", "CRRC-SMCACHE01","CRRC-SMCACHE02" -wait -Force -verbose 4>"C:\DSC_Configuration\CRRC PUSH $(get-date -format MM-dd-yyyy).txt"
+#TRACK IT
+Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName CNC-Trackit-DB -Wait -Verbose -Force 4> "C:\DSC_Configuration\CNC-TRACKIT-DB $(Get-Date -Format MM-dd-yyyy).txt"
+Start-DscConfiguration -Path C:\DSC_Configuration -ComputerName CRRC-Trackit-DB -Wait -Verbose -Force 4> "C:\DSC_Configuration\CRRC-TRACKIT-DB $(Get-Date -Format MM-dd-yyyy).txt"
