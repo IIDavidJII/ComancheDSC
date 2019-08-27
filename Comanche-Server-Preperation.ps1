@@ -130,7 +130,7 @@ Node $AllNodes.NodeName {
 
    Registry HTTP2Disable2 {
      Ensure = "Present"
-     Key = "HKEY_LOCAL_MACTHINE\System\CurrentControlSet\Services\HTTP\Parameters"
+     Key = "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\HTTP\Parameters"
      ValueName = "EnableHttp2Cleartext"
      ValueData = "0"
    }
