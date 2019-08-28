@@ -175,6 +175,14 @@ Node $AllNodes.NodeName {
 
   }
 
+  Node $AllNodes.Where{$_.Role -eq "nconnect"}.NodeName
+  {
+    WindowsFeature NetworkLoadBalancer {
+      Name = "NLB"
+      Ensure = "Present"
+    }
+  }
+
   Node $AllNodes.Where{$_.Role -eq "SQLServer"}.NodeName
   {
     File CopySQLConfigScript {
@@ -198,6 +206,75 @@ Node $AllNodes.NodeName {
          DestinationPath = "s:\DBE_Scripts\0.SQL Server Configuration.SQL"
          DependsOn = "[File]SQLConfigScript1"
       }
+
+    
+    File SQLConfigScript3 {
+         Ensure = "Present"
+         Type = "Directory"
+         DestinationPath = "S:\Install"
+      }
+
+    SmbShare InstallShare {
+        Name = "Install$"
+        Path = "S:\Install"
+        FullAccess = @('Everyone')
+      }
+
+    File SQLConfigScript4 {
+         Ensure = "Present"
+         Type = "Directory"
+         DestinationPath = "S:\Reports"
+      }
+
+    SmbShare ReportsShare {
+         Name = "Reports$"
+         Path = "S:\Reports"
+         FullAccess = @("Everyone")
+      }
+ 
+    File SQLConfigScript5 {
+         Ensure = "Present"
+         Type = "Directory"
+         DestinationPath = "S:\Omniview"
+      }
+    
+    SmbShare OmniviewShare {
+         Name = "Omniview$"
+         Path = "S:\Omniview"
+         FullAccess = @("Everyone")
+      }
+
+    File SQLConfigScript6 {
+         Ensure = "Present"
+         Type = "Directory"
+         DestinationPath = "S:\Bills"
+      }
+
+    SmbShare BillsShare {
+         Name = "Bills$"
+         Path = "S:\Bills"
+         FullAccess = @("Everyone")
+      }
+      
+    File SQLConfigScript7 {
+         Ensure = "Present"
+         Type = "Directory"
+         DestinationPath = "S:\Tickets"
+      }
+
+    SmbShare TicketsShare {
+         Name = "Tickets$"
+         Path = "S:\Tickets"
+         FullAccess = @("Everyone")
+      }
+
+    File SQLConfigScript8 {
+         Ensure = "Present"
+         Type = "Directory"
+         DestinationPath = "L:\Log"
+      }
+
+
   }
 }
 
