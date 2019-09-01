@@ -91,6 +91,7 @@ Node $AllNodes.NodeName {
        RemoteAdministrationAccessEnabled = $true
        InboundTransactionsEnabled = $true
        OutboundTransactionsEnabled = $true
+       XATransactionsEnabled = $true
        AuthenticationLevel = "NoAuth"
      }
 
@@ -303,10 +304,10 @@ $cd = @{
          }
         
         @{  NodeName = "CNE-LOY-SQL01"
-            Role = "SQLServer"
+            Role = "LoyaltySQLServer"
          }
         @{  NodeName = "CNE-LOY-SQL02"
-            Role = "SQLServer"
+            Role = "LoyaltySQLServer"
          }
 
         @{  NodeName = "CNC-Test-SQL"
@@ -314,7 +315,7 @@ $cd = @{
          }
 
         @{  NodeName = "CNC-Test-Loysql"
-            Role = "SQLServer"
+            Role = "LoyaltySQLServer"
          }
 
         @{  NodeName = "STAR-ATI-SQL01"
