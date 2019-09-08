@@ -77,6 +77,13 @@ Node $AllNodes.NodeName {
       Ensure = "Present"
      }
 
+    WindowsFeature net35Framework
+     {
+      Name = "NET-Framework-Core"
+      Ensure = "Present"
+      Source = "\\CNC-TEST-SQL\sxs"
+     }
+
 #User Account Control    
     xUac DisableUAC 
      {
@@ -92,6 +99,7 @@ Node $AllNodes.NodeName {
        InboundTransactionsEnabled = $true
        OutboundTransactionsEnabled = $true
        XATransactionsEnabled = $true
+       LUTransactionsEnabled = $true
        AuthenticationLevel = "NoAuth"
      }
 
@@ -184,6 +192,13 @@ Node $AllNodes.NodeName {
       Name = "NLB"
       Ensure = "Present"
     }
+
+    File TempFolder {
+         Ensure = "Present"
+         Type = "Directory"
+         DestinationPath = "c:\Temp"
+      }
+
   }
 
   Node $AllNodes.Where{$_.Role -eq "SQLServer"}.NodeName
