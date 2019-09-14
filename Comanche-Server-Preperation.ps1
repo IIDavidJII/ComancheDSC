@@ -167,7 +167,7 @@ Node $AllNodes.NodeName {
    #Disable IPv6
    Script IPV6Disable {
    TestScript = {$AdapterIVP6 = Get-NetAdapterBinding -name * -ComponentID 'MS_TCPIP6'
-                 IF ($AdapterIVP6.enabled -eq 'True'){return $true} Else {return $false}
+                 IF((Get-NetAdapterBinding  -Name * -ComponentID ms_tcpip6).Enabled-eq $false) {return $true} Else {return $false}
                  }
    SetScript = {$AdapterIVP6_1 = Get-NetAdapterBinding -name * -ComponentID 'MS_TCPIP6'
                 FOREACH ($Adapter_1 in $AdapterIVP6_1)
