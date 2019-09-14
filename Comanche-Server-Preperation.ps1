@@ -130,13 +130,10 @@ Node $AllNodes.NodeName {
      Script DisablePowerManagement
        {
          TestScript = {
-                        $adapterPower = Get-NetAdapterPowerManagement
-                        
-                        If (
-                             $adapterPower.ArpOffload -eq "Unsupported"  -and $adapterPower.NSOffload -eq "Unsupported" -and $adapterPower.RsnRekeyOffload -eq "Unsupported" -and $adapterPower.D0PacketCoalescing-eq "Unsupported" -and $adapterPower.SelectiveSuspend -eq "Unsupported" -and $adapterPower.DeviceSleepOnDisconnect -eq "Unsupported" -and $adapterPower.WakeOnMagicPacket -eq "Unsupported" -and $adapterPower.WakeOnPattern -eq "Unsupported"
-                           ){return $true}
-                             
-                       Else {return $false}
+                        $adapterPower = Get-NetAdapterPowerManagement                     
+                        IF($adapterPower.ArpOffload -ne "Enabled" -and $adapterPower.NSOffload -ne "Enabled" -and $adapterPower.RsnRekeyOffload -ne "Enabled" -and $adapterPower.D0PacketCoalescing -ne "Enabled" -and $adapterPower.DeviceSleepOnDisconnect -ne "Enabled" -and $adapterPower.WakeOnMagicPacket -ne "Enabled" -and $adapterPower.WakeOnPattern -ne "Enabled" )
+                        {return $true} 
+                        ELSE {return $false}
                       }
 
          SetScript = { $AdapterPower1 = Get-NetAdapterPowerManagement
