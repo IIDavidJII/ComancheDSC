@@ -48,8 +48,23 @@ Node $AllNodes.NodeName {
                     }
        SetScript = {Set-NetFIrewallProfile -all -Enabled False}
      }
+#allow DTC through firewall
 
+  Script AllowDTCappfirewall
+    {
+       GetScript = {Get-NetFirewallRule -DisplayGroup "Distributed Transaction Coordinator" }
 
+       Testscript = {
+                      IF ((Get-NetFirewallRule -DisplayGroup "Distributed Transaction Coordinator").Enabled -eq $true)
+                           {Return $true}
+                      Else {Return $false}
+                    }
+
+       SetScript =  {
+                      Set-NetFirewallRule -DisplayGroup "Distributed Transaction Coordinator" -Enabled True 
+                    }
+    }
+    
 #TimeZone
     TimeZone SetTimeZone
      {
